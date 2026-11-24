@@ -774,10 +774,17 @@
   var synth = window.speechSynthesis;
   var readButton = $('#readSummaryBtn');
   var stopButton = $('#stopReadBtn');
+  var pauseButton = $('#pauseReadBtn');
+  var stopFab = $('#stopReadFab');
+  var pauseFab = $('#pauseReadFab');
+  var speechPlayer = $('#speechPlayer');
+  var pauseButtons = [pauseButton, pauseFab];
   var speechNote = $('#speechNote');
   var speechChunks = [];
   var speechIndex = 0;
   var speechRunning = false;
+  var speechPaused = false;
+  var speechPausedAtChunkEnd = false;
 
   if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') {
     if (speechNote) speechNote.textContent = 'Seu navegador não oferece leitura em voz alta. Você pode usar o leitor de tela do seu aparelho.';
@@ -803,13 +810,39 @@
     return chunks;
   }
 
+  function updatePauseUi() {
+    pauseButtons.forEach(function (button) {
+      if (!button) return;
+      button.hidden = !speechRunning;
+      button.setAttribute('aria-pressed', speechPaused ? 'true' : 'false');
+      button.setAttribute('aria-label', speechPaused ? 'Retomar leitura' : 'Pausar leitura');
+      var icon = button.querySelector('[data-pause-icon]');
+      if (icon) icon.setAttribute('href', speechPaused ? '#i-play' : '#i-pause');
+      var label = button.querySelector('[data-pause-label]');
+      if (label) {
+        var compact = button === pauseFab;
+        label.textContent = speechPaused
+          ? (compact ? 'Retomar' : 'Retomar leitura')
+          : (compact ? 'Pausar' : 'Pausar leitura');
+      }
+    });
+    if (speechPlayer) speechPlayer.classList.toggle('is-paused', speechPaused);
+  }
+
   function setSpeechUi(running) {
     speechRunning = running;
+    if (!running) {
+      speechPaused = false;
+      speechPausedAtChunkEnd = false;
+      if (synth) synth.resume();
+    }
     if (stopButton) stopButton.hidden = !running;
+    if (speechPlayer) speechPlayer.hidden = !running;
     if (readButton) readButton.disabled = running;
     $$('[data-read-summary]').forEach(function (button) {
       button.disabled = running;
     });
+    updatePauseUi();
   }
 
   function stopSpeech(silent) {
@@ -818,6 +851,28 @@
     speechIndex = 0;
     setSpeechUi(false);
     if (!silent) showToast('Leitura parada.');
+  }
+
+  function togglePauseSpeech() {
+    if (!synth || !speechRunning) return;
+
+    if (speechPaused) {
+      speechPaused = false;
+      if (speechPausedAtChunkEnd) {
+        speechPausedAtChunkEnd = false;
+        speakNextChunk();
+      } else {
+        synth.resume();
+      }
+      if (speechNote) speechNote.textContent = 'A leitura está em andamento. Você pode pausar ou parar quando quiser.';
+    } else {
+      synth.pause();
+      speechPaused = true;
+      speechPausedAtChunkEnd = false;
+      if (speechNote) speechNote.textContent = 'Leitura pausada. Clique em retomar para continuar de onde parou.';
+    }
+
+    updatePauseUi();
   }
 
   function speakNextChunk() {
@@ -838,6 +893,10 @@
 
     utterance.onend = function () {
       speechIndex += 1;
+      if (speechPaused) {
+        speechPausedAtChunkEnd = true;
+        return;
+      }
       speakNextChunk();
     };
     utterance.onerror = function (event) {
@@ -861,12 +920,16 @@
     speechChunks = splitSpeech(text);
     speechIndex = 0;
     setSpeechUi(true);
-    if (speechNote) speechNote.textContent = 'A leitura está em andamento. Você pode parar quando quiser.';
+    if (speechNote) speechNote.textContent = 'A leitura está em andamento. Você pode pausar ou parar quando quiser.';
     speakNextChunk();
   }
 
   on(readButton, 'click', readSummary);
+  pauseButtons.forEach(function (button) {
+    on(button, 'click', togglePauseSpeech);
+  });
   on(stopButton, 'click', function () { stopSpeech(false); });
+  on(stopFab, 'click', function () { stopSpeech(false); });
 
   on(window, 'pagehide', function () {
     if (synth) synth.cancel();

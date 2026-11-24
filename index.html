@@ -86,6 +86,7 @@
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19Z"/><path d="M12 9v5M12 17h.01"/></symbol>
     <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4Z"/><path d="M17 9a4 4 0 0 1 0 6M19.5 6.5a8 8 0 0 1 0 11"/></symbol>
     <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></symbol>
     <symbol id="i-accessibility" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M4 8h16M12 8v6M12 14l-4 7M12 14l4 7"/></symbol>
     <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18Z" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 6V4h16v2M12 4v16M8 20h8"/></symbol>
@@ -1120,6 +1121,10 @@
             <svg class="icon" aria-hidden="true"><use href="#i-volume"></use></svg>
             Ouvir a apresentação
           </button>
+          <button class="btn btn--ghost" id="pauseReadBtn" type="button" hidden aria-pressed="false" aria-label="Pausar leitura">
+            <svg class="icon" aria-hidden="true"><use href="#i-pause" data-pause-icon></use></svg>
+            <span data-pause-label>Pausar leitura</span>
+          </button>
           <button class="btn btn--ghost" id="stopReadBtn" type="button" hidden>
             <svg class="icon" aria-hidden="true"><use href="#i-stop"></use></svg>
             Parar leitura
@@ -1198,6 +1203,20 @@
   </div>
 
   <div class="fab-stack">
+    <div class="speech-fab" id="speechPlayer" role="group" aria-label="Controles da leitura em voz alta" hidden>
+      <span class="speech-fab__label">
+        <svg class="icon" aria-hidden="true"><use href="#i-volume"></use></svg>
+        <span class="speech-fab__label-text">Lendo o site</span>
+      </span>
+      <button class="speech-fab__btn" id="pauseReadFab" type="button" aria-pressed="false" aria-label="Pausar leitura">
+        <svg class="icon" aria-hidden="true"><use href="#i-pause" data-pause-icon></use></svg>
+        <span data-pause-label>Pausar</span>
+      </button>
+      <button class="speech-fab__btn speech-fab__btn--stop" id="stopReadFab" type="button" aria-label="Parar leitura">
+        <svg class="icon" aria-hidden="true"><use href="#i-stop"></use></svg>
+        <span>Parar</span>
+      </button>
+    </div>
     <button class="to-top" id="toTop" type="button" aria-label="Voltar ao topo" hidden>
       <svg class="icon" aria-hidden="true"><use href="#i-arrow-up"></use></svg>
     </button>

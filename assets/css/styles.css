@@ -2665,6 +2665,66 @@ dialog::backdrop {
 }
 .help-fab__btn:hover { transform: translateY(-2px); background: #7A3424; }
 .help-fab__btn .icon { width: 1.2rem; height: 1.2rem; }
+
+.speech-fab {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  max-width: calc(100vw - 2.4rem);
+  padding: .35rem .35rem .35rem .85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg-alt);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+.speech-fab[hidden] { display: none; }
+.speech-fab__label {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding-right: .15rem;
+  color: var(--accent-strong);
+  font-size: .82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.speech-fab__label .icon {
+  width: 1rem;
+  height: 1rem;
+  animation: speechPulse 1.2s ease-in-out infinite;
+}
+.speech-fab.is-paused .speech-fab__label .icon { animation: none; }
+.speech-fab__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  min-height: 2.4rem;
+  padding: .35rem .75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .2s var(--ease);
+}
+.speech-fab__btn:hover { background: var(--bg-alt); }
+.speech-fab__btn .icon { width: .95rem; height: .95rem; }
+.speech-fab__btn--stop { color: var(--accent-strong); }
+@keyframes speechPulse {
+  50% { opacity: .45; }
+}
+html[data-motion="off"] .speech-fab__label .icon { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .speech-fab__label .icon { animation: none; }
+}
+@media (max-width: 560px) {
+  .speech-fab { padding-left: .6rem; }
+  .speech-fab__label-text { display: none; }
+}
 .to-top {
   display: grid;
   place-items: center;
